@@ -26,14 +26,26 @@ public class PokerGame {
                 String[] player1 = Arrays.copyOfRange(card, 0, 5);
                 String[] player2 = Arrays.copyOfRange(card, 5, 10);
 
-                System.out.println(Arrays.toString(player1));
-                System.out.println(Arrays.toString(player2));
+                // System.out.println(Arrays.toString(player1));
+                // System.out.println(Arrays.toString(player2));
             }
 
             scanner.close();
         } catch (IOException e) {
             System.out.println("IO Exception Error");
         }
+
+        String[] test = {"TH", "JH", "QH", "AH", "KH"};
+        System.out.println(Arrays.toString(test));
+
+        List<Integer> cardValues = new ArrayList<>(getValue(test));
+        List<Character> cardSuits = new ArrayList<>(getSuit(test));
+
+        System.out.println(isFlush(cardSuits));
+        System.out.println(isStraight(cardValues));
+        System.out.println(isStraightFlush(cardValues,cardSuits));
+        System.out.println(isRoyalFlush(cardValues,cardSuits));
+
     }
 
     // Function to extract the value of the card
@@ -82,8 +94,9 @@ public class PokerGame {
         char suit = cardSuits.get(0);
         boolean flag = true;
 
+        // if there is 1 card not the same, turn flag to false
         for(int i = 0; i < cardSuits.size(); i++) {
-            if(suit == cardSuits.get(i)) {
+            if(suit != cardSuits.get(i)) {
                 flag = false;
                 break;
             }
@@ -96,8 +109,9 @@ public class PokerGame {
         Collections.sort(cardValues);
         boolean flag = true;
 
-        for(int i = 0; i < cardValues.size(); i++) {
-            if(cardValues.get(i) != cardValues.get(i+1) - 1) {
+        // Check if the card value is consecutive, if the number is not equal to the previous number + 1, turn flag to false
+        for(int i = 1; i < cardValues.size(); i++) {
+            if(cardValues.get(i) != cardValues.get(i-1) + 1) {
                 flag = false;
                 break;
             }
