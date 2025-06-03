@@ -128,7 +128,7 @@ public class PokerGame {
     public static boolean containsAllHighCard (List<Integer> cardValues) {
         boolean flag = true;
 
-        for(int i = 0; i < cardValues.size(); i++) {
+        for (int i = 0; i < cardValues.size(); i++) {
             if(cardValues.get(i) < 10) {
                 flag = false;
                 break;
@@ -142,6 +142,29 @@ public class PokerGame {
         return isStraightFlush(cardValues, cardSuits) && containsAllHighCard(cardValues);
     }
 
+    // Function to check if it has a pair, 2 pairs, 3 of a kind, full house, four of a kind
+    public static String checkCombination(List<Integer> cardValues) {
+        Map<Integer, Integer> countPairs = new HashMap<>();
 
+        for (int value: cardValues){
+            if(cardValues.contains(value)) {
+                countPairs.put(value, countPairs.get(value) + 1);
+            }
+
+            else {
+                countPairs.put(value, 1);
+            }
+        }
+
+        int pairs = 0;
+
+        for (int count: countPairs.values()){
+            if (count == 2)  pairs++ ;
+            else if (count == 3) return "Three of A Kind";
+            else if (count == 4) return "Four of A Kind";
+        }
+
+        return "No pair";
+    }
 
 }
