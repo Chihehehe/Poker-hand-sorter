@@ -105,9 +105,27 @@ public class PokerGame {
         return flag;
     }
 
-    // Function to check if it's a straight flush
-    public static boolean isStraighFlush (List<Integer> cardValues, List<Character> cardSuits) {
+    // Function to check if it's a Straight Flush
+    public static boolean isStraightFlush (List<Integer> cardValues, List<Character> cardSuits) {
         return isFlush(cardSuits) && isStraight(cardValues);
+    }
+
+    //Function to check if it contains all high card for Royal Flush
+    public static boolean containsAllHighCard (List<Integer> cardValues) {
+        boolean flag = true;
+
+        for(int i = 0; i < cardValues.size(); i++) {
+            if(cardValues.get(i) < 10) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
+    // Function to check if it's a Royal Flush
+    public static boolean isRoyalFlush (List<Integer> cardValues, List<Character> cardSuits) {
+        return isStraightFlush(cardValues, cardSuits) && containsAllHighCard(cardValues);
     }
 
 
