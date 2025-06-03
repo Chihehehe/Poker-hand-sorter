@@ -90,7 +90,26 @@ public class PokerGame {
         }
         return flag;
     }
-    
+
+    // Function to check if it's a straight
+    public static boolean isStraight(List<Integer> cardValues) {
+        Collections.sort(cardValues);
+        boolean flag = true;
+
+        for(int i = 0; i < cardValues.size(); i++) {
+            if(cardValues.get(i) != cardValues.get(i+1) - 1) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
+    // Function to check if it's a straight flush
+    public static boolean isStraighFlush (List<Integer> cardValues, List<Character> cardSuits) {
+        return isFlush(cardSuits) && isStraight(cardValues);
+    }
+
 
 
 }
