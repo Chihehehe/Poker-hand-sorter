@@ -157,14 +157,21 @@ public class PokerGame {
         }
 
         int pairs = 0;
+        boolean hasThree = false;
+        boolean hasFour = false; 
 
         for (int count: countPairs.values()){
-            if (count == 2)  pairs++ ;
-            else if (count == 3) return "Three of A Kind";
-            else if (count == 4) return "Four of A Kind";
+            if (count == 4) hasFour = true;
+            else if (count == 3) hasThree = true;
+            else if (count == 2) pairs++ ;
         }
+
+        if (hasFour) return "Four of A Kind";
+        if (hasThree && pairs == 1) return "Full House";
+        if (hasThree) return "Three of A Kind";
+        if (pairs == 2) return "Two Pairs";
+        if (pairs == 1) return "One Pair";
 
         return "No pair";
     }
-
 }
