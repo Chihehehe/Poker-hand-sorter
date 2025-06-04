@@ -4,49 +4,40 @@ import java.nio.file.*;
 
 public class PokerGame {
     public static void main(String[] args) {
-        // Read file path
-        Path path = Paths.get("poker-hands.txt");
+        Scanner scanner = new Scanner(System.in);   // Read file from command-line
 
-        try {
-            Scanner scanner = new Scanner(path);
+        int player1Win = 0;
+        int player2Win = 0;
 
-            while(scanner.hasNextLine()) {
-                // Read each line
-                String line = scanner.nextLine();
-                if(line.isEmpty()) continue;
+        while(scanner.hasNextLine()) {              // Read each line
+            String line = scanner.nextLine();
+            if(line.isEmpty()) continue;
 
-                //Read each card
-                String[] card = line.split(" ");
-                if(card.length != 10) {
-                    System.out.println("Invalid game match " + line);
-                    continue;
-                }
+            String[] card = line.split(" ");   //Read each card
 
-                //Implement 2 players holding 5 cards each
-                String[] player1 = Arrays.copyOfRange(card, 0, 5);
-                String[] player2 = Arrays.copyOfRange(card, 5, 10);
-
-                // System.out.println(Arrays.toString(player1));
-                // System.out.println(Arrays.toString(player2));
+            if(card.length != 10) {
+                System.out.println("Invalid game match " + card.length);
+                continue;
             }
 
-            scanner.close();
-        } catch (IOException e) {
-            System.out.println("IO Exception Error");
+            //Implement 2 players holding 5 cards each
+            String[] player1 = Arrays.copyOfRange(card, 0, 5);
+            String[] player2 = Arrays.copyOfRange(card, 5, 10);
+
+            String result = compareHand(player1, player2);
+
+            if (result.equals("Player 1 wins")) {
+                player1Win++;
+            } else if (result.equals("Player 2 wins")) {
+                player2Win++;
+            }
         }
+        scanner.close();
 
-        String[] test = {"TH", "JH", "QH", "AH", "KH"};
-        System.out.println(Arrays.toString(test));
-
-        List<Integer> cardValues = new ArrayList<>(getValue(test));
-        List<Character> cardSuits = new ArrayList<>(getSuit(test));
-
-        System.out.println(isFlush(cardSuits));
-        System.out.println(isStraight(cardValues));
-        System.out.println(isStraightFlush(cardValues,cardSuits));
-        System.out.println(isRoyalFlush(cardValues,cardSuits));
-
+        System.out.println("Player 1: " + player1Win);
+        System.out.println("Player 2: " + player2Win);
     }
+
 
     // Function to extract the value of the card
     public static List<Integer> getValue(String[] playerHand) {
@@ -77,13 +68,14 @@ public class PokerGame {
         return cardValues;
     }
 
+
     // Function to extract the suit of the card
     public static List<Character> getSuit(String[] playerHand) {
         List<Character> cardSuits = new ArrayList<>();
 
         // Add each suit to the array
         for(int i = 0; i < playerHand.length; i++){
-            cardSuits.add(playerHand[i].charAt(1));     //extract the second character
+            cardSuits.add(playerHand[i].charAt(1));     // Extract the second character
         }
 
         return cardSuits;
@@ -92,31 +84,28 @@ public class PokerGame {
     // Function to check if it's a flush
     public static boolean isFlush(List<Character> cardSuits) {
         char suit = cardSuits.get(0);
-        boolean flag = true;
 
-        // if there is 1 card not the same, turn flag to false
+        // if there is 1 card not the same, return false
         for(int i = 0; i < cardSuits.size(); i++) {
             if(suit != cardSuits.get(i)) {
-                flag = false;
-                break;
+                return false;
             }
         }
-        return flag;
+        return true;
     }
 
-    // Function to check if it's a straight
+    // Function to check if it's a Straight
     public static boolean isStraight(List<Integer> cardValues) {
-        Collections.sort(cardValues);
-        boolean flag = true;
+        List<Integer> sorted = new ArrayList<>(cardValues);
+        Collections.sort(sorted);
 
-        // Check if the card value is consecutive, if the number is not equal to the previous number + 1, turn flag to false
-        for(int i = 1; i < cardValues.size(); i++) {
-            if(cardValues.get(i) != cardValues.get(i-1) + 1) {
-                flag = false;
-                break;
+        // Check if the card value is consecutive, if the number is not equal to the previous number + 1, return false
+        for(int i = 1; i < sorted.size(); i++) {
+            if(sorted.get(i) != sorted.get(i-1) + 1) {
+                return false;
             }
         }
-        return flag;
+        return true;
     }
 
     // Function to check if it's a Straight Flush
@@ -126,15 +115,12 @@ public class PokerGame {
 
     //Function to check if it contains all high card for Royal Flush
     public static boolean containsAllHighCard (List<Integer> cardValues) {
-        boolean flag = true;
-
         for (int i = 0; i < cardValues.size(); i++) {
             if(cardValues.get(i) < 10) {
-                flag = false;
-                break;
+                return false;
             }
         }
-        return flag;
+        return true;
     }
 
     // Function to check if it's a Royal Flush
@@ -142,19 +128,26 @@ public class PokerGame {
         return isStraightFlush(cardValues, cardSuits) && containsAllHighCard(cardValues);
     }
 
-    // Function to check if it has a pair, 2 pairs, 3 of a kind, full house, four of a kind
-    public static String checkCombination(List<Integer> cardValues) {
-        Map<Integer, Integer> countPairs = new HashMap<>();
+    // Function to count the frequency of the values in the hand
+    public static Map<Integer, Integer> countMap(List<Integer> cardValues) {
+        Map<Integer, Integer> countMap = new HashMap<>();
 
         for (int value: cardValues){
-            if(cardValues.contains(value)) {
-                countPairs.put(value, countPairs.get(value) + 1);
+            // If the value is already in the map, increase the count
+            if(countMap.containsKey(value)) {
+                countMap.put(value, countMap.get(value) + 1);
             }
-
             else {
-                countPairs.put(value, 1);
+                countMap.put(value, 1);
             }
         }
+
+        return countMap;
+    }
+
+    // Function to check if it has a pair, 2 pairs, 3 of a kind, full house, four of a kind
+    public static String checkCombination(List<Integer> cardValues) {
+        Map<Integer, Integer> countPairs = countMap(cardValues);
 
         int pairs = 0;
         boolean hasThree = false;
@@ -173,5 +166,70 @@ public class PokerGame {
         if (pairs == 1) return "One Pair";
 
         return "No pair";
+    }
+
+
+    // Funtion to rank the poker's result
+    public static int getRank (String[] playerHand) {
+        List<Integer> values = getValue(playerHand);
+        List<Character> suits = getSuit(playerHand);
+        
+        String combination = checkCombination(values);
+
+        if (isRoyalFlush(values, suits)) return 10;
+        if (isStraightFlush(values, suits)) return 9;
+        if (combination.equals("Four of A Kind")) return 8;
+        if (combination.equals("Full House")) return 7;
+        if (isFlush(suits)) return 6;
+        if (isStraight(values)) return 5;
+        if (combination.equals("Three of A Kind")) return 4;
+        if (combination.equals("Two Pairs")) return 3;
+        if (combination.equals("One Pair")) return 2;
+
+        return 1;
+    }
+
+    // Funtion to sort frequency and value of the hand 
+    public static List<Integer> getSorted(Map<Integer, Integer> countMap) {
+        List<Integer> result = new ArrayList<>(countMap.keySet());
+
+        Collections.sort(result, (a,b) -> {
+            int freq1 = countMap.get(a);
+            int freq2 = countMap.get(b);
+
+            if (freq1 != freq2) return freq2 - freq1;   // Higher frequency first
+            else return b - a;                          // Higher value first
+        });
+
+        return result;
+    }
+
+
+    // Function to compare the hands between 2 players
+    public static String compareHand(String[] player1, String[] player2) {
+        int rank1 = getRank(player1);
+        int rank2 = getRank(player2);
+
+        if (rank1 > rank2) return "Player 1 wins";
+        if (rank1 < rank2) return "Player 2 wins";
+
+        else {      // Compare highcard
+            List<Integer> values1 = new ArrayList<>(getValue(player1));
+            List<Integer> values2 = new ArrayList<>(getValue(player2));
+
+            Map<Integer, Integer> count1 = countMap(values1);
+            Map<Integer, Integer> count2 = countMap(values2);
+
+            List<Integer> sorted1 = getSorted(count1);
+            List<Integer> sorted2 = getSorted(count2);
+
+            for (int i = 0; i < sorted1.size(); i++) {
+                if (sorted1.get(i) > sorted2.get(i)) return "Player 1 wins";
+                else if (sorted1.get(i) < sorted2.get(i)) return "Player 2 wins";
+
+            }
+        }
+
+        return "It's a tie";
     }
 }
