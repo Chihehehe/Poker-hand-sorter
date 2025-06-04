@@ -12,9 +12,10 @@ This project is a command-line Java program that processes poker hands from inpu
 
 ```bash
 javac PokerGame.java
+```
 
 2. Run the program with the input file poker-hands.txt:
 
 ```bash
 java PokerGame < poker-hands.txt
-
+```
